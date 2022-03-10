@@ -1,0 +1,62 @@
+
+### 						install Nginx (نصب)						###
+
+
+sudo mkdir -p /var/www/your_domain/html
+
+sudo chown -R $USER:$USER /var/www/your_domain/html
+
+sudo chmod -R 755 /var/www/your_domain
+
+vim /var/www/your_domain/html/index.html
+	hello world
+
+
+sudo vim /etc/nginx/sites-available/your_domain
+
+
+	server {
+        	listen 80;
+        	listen [::]:80;
+
+        	root /var/www/your_domain/html;
+        	index index.html index.htm index.nginx-debian.html;
+
+        	server_name your_domain www.your_domain;
+
+        	location / {
+                	try_files $uri $uri/ =404;
+        	}
+}
+
+
+sudo ln -s /etc/nginx/sites-available/your_domain /etc/nginx/sites-enabled/
+
+
+
+sudo nginx -t  ( check correct config )
+
+sudo systemctl restart nginx
+
+
+########										  این بخش برای تنظیمات بیشتر 
+
+location  /test/ {	==> if test find in url upload error/index.html اگر تست در url دیده شد بیاد سراغ فایل اررور و ایندکس را بخواند
+
+                try_files $uri $uri/  /error/index.html;
+                if ($http_user_agent ~* (curl) ){ ==> for block curl command return code 403  بلاک کردن دستور 
+                                return 403;
+
+
+                         }
+        rewrite ^/blog$ http://blog.quera.ir redirect; ==> redirect all request contain blog redirect to quera.ir	نحوه ریدایرکت کردن 
+
+برای داشتن تنظیمات کش کردن به این صورت عمل میکنیم
+
+proxy_cache_path /usr/share/nginx/cache levels=1:2(اگر از یک لول استفاده شود همه در یک بخش ذخیره میشود که باعث سنگینی فایل میشود) keys_zone=my_cache:10m inactive=60m (اگر هر ۶۰ دقیقه بهش مراجعه نشد خودکار حذف شود)use_temp_path=off;
+server {
+                listen 81;
+                listen [::]:81;
+                proxy_cache my_cache;
+
+
