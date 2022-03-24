@@ -1,0 +1,36 @@
+apt install bind9
+
+vim /etc/bind/named.conf.default-zones
+-	zone "name-zone" {
+        type master;
+        file "/etc/bind/db.namezone";
+        }
+
+
+cp db.127 db.namezone
+
+vim db.namezone
+-	
+; BIND reverse data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     eagame.com. root.eagame. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+;
+@       IN      NS      eagame.com.
+ns  IN      A     ip-server
+@	IN	MX	1	mail
+mail	IN	A	ip-server
+
+## slave server config ##
+
+	zone "name-zone" {
+        type slave;
+        masters { ip-master-server; };
+        file "/etc/bind/db.namezone";
+        }
+
